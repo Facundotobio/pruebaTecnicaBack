@@ -1,0 +1,22 @@
+# .NET
+bin/
+obj/
+*.user
+*.suo
+*.usersecrets
+
+# Visual Studio
+.vs/
+.vscode/
+
+# NuGet
+packages/
+
+# Logs
+*.log
+
+# Database
+*.db
+
+# Environment
+appsettings.Development.json

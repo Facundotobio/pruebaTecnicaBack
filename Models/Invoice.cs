@@ -1,0 +1,25 @@
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace PruebaTecnicaFacundoTobioBack.Models
+{
+    public class Invoice
+    {
+        [Key]
+        public int InvoiceId { get; set; }
+
+        [Required]
+        public int CustomerId { get; set; }
+
+        public DateTime Fecha { get; set; } = DateTime.UtcNow;
+
+        [MaxLength(20)]
+        public string Numero { get; set; } = string.Empty;
+
+        [Required]
+        public decimal Total { get; set; }
+
+        // Navegación
+        public Customer? Customer { get; set; }
+        public ICollection<InvoiceItem> Items { get; set; } = new List<InvoiceItem>();
+    }
+}

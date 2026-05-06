@@ -1,0 +1,6 @@
+@PruebaTecnicaFacundoTobioBack_HostAddress = http://localhost:5296
+
+GET {{PruebaTecnicaFacundoTobioBack_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
