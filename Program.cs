@@ -3,6 +3,7 @@ using PruebaTecnicaFacundoTobioBack.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// 1. CONFIGURACIÓN DE SERVICIOS (builder.Services)
 // ==================== CORS CONFIGURATION ====================
 builder.Services.AddCors(options =>
 {
@@ -16,13 +17,20 @@ builder.Services.AddCors(options =>
         )
         .AllowAnyHeader()
         .AllowAnyMethod()
-        .AllowCredentials();              // Si luego necesito cookies o auth
+        .AllowCredentials();
     });
 });
 
 // ==================== DATABASE ====================
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+if (string.IsNullOrEmpty(connectionString))
+{
+    throw new Exception("La cadena de conexión 'DefaultConnection' no fue encontrada.");
+}
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseNpgsql(connectionString));
 
 // ==================== CONTROLLERS + JSON ====================
 builder.Services.AddControllers()
@@ -35,9 +43,26 @@ builder.Services.AddControllers()
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// 2. CONSTRUCCIÓN DE LA APP
 var app = builder.Build();
 
-// ==================== MIDDLEWARE ====================
+// 3. MIGRACIONES AUTOMÁTICAS
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        var context = services.GetRequiredService<ApplicationDbContext>();
+        context.Database.Migrate();
+        Console.WriteLine("Migraciones aplicadas con éxito.");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Error al aplicar migraciones: {ex.Message}");
+    }
+}
+
+// 4. CONFIGURACIÓN DEL MIDDLEWARE (app.Use...)
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -46,10 +71,11 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseCors("AllowFrontend");     // debe ir ANTES de Authorization
+app.UseCors("AllowFrontend");
 
 app.UseAuthorization();
 
 app.MapControllers();
 
+// 5. ARRANCAR LA APP
 app.Run();
