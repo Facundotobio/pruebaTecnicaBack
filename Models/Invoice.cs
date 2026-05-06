@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using static PruebaTecnicaFacundoTobioBack.Data.@enum;
 
 namespace PruebaTecnicaFacundoTobioBack.Models
 {
@@ -17,6 +18,9 @@ namespace PruebaTecnicaFacundoTobioBack.Models
 
         [Required]
         public decimal Total { get; set; }
+
+        [Required]
+        public InvoiceStatus Estado { get; set; } = InvoiceStatus.Activo;
 
         // Navegación
         public Customer? Customer { get; set; }

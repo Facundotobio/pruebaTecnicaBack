@@ -11,7 +11,8 @@ builder.Services.AddCors(options =>
         policy.WithOrigins(
             "http://localhost:3000",
             "https://localhost:3000",
-            "http://127.0.0.1:3000"
+            "http://127.0.0.1:3000",
+            "https://prueba-tecnica-front-sigma.vercel.app"
         )
         .AllowAnyHeader()
         .AllowAnyMethod()

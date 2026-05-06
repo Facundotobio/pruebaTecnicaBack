@@ -30,6 +30,10 @@ namespace PruebaTecnicaFacundoTobioBack.Data
                 .WithMany(i => i.Items)
                 .HasForeignKey(ii => ii.InvoiceId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Invoice>()
+                .Property(i => i.Estado)
+                .HasConversion<int>();
         }
     }
 }
