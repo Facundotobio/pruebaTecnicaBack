@@ -2,6 +2,7 @@ using PruebaTecnicaFacundoTobioBack.Application.DTOs;
 using PruebaTecnicaFacundoTobioBack.Application.Interfaces;
 using PruebaTecnicaFacundoTobioBack.Domain.Entities;
 using PruebaTecnicaFacundoTobioBack.Domain.Interfaces;
+using static PruebaTecnicaFacundoTobioBack.Infrastructure.Data.@enum;
 
 namespace PruebaTecnicaFacundoTobioBack.Application.Services
 {
