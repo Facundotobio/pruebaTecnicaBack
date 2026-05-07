@@ -22,13 +22,14 @@ namespace PruebaTecnicaFacundoTobioBack.Application.Services
                 .Where(c => c.Estado == EntityStatus.Activo)
                 .OrderBy(c => c.Nombre)
                 .Select(c => new CustomerResponseDto
-            {
-                CustomerId = c.CustomerId,
-                Nombre = c.Nombre,
-                Direccion = c.Direccion,
-                Telefono = c.Telefono,
-                Email = c.Email
-            });
+                {
+                    CustomerId = c.CustomerId,
+                    Nombre = c.Nombre,
+                    Direccion = c.Direccion,
+                    Telefono = c.Telefono,
+                    Email = c.Email,
+                    FechaCreacion = c.FechaCreacion
+                });
         }
 
         public async Task<CustomerResponseDto?> GetByIdAsync(int id)
@@ -42,7 +43,8 @@ namespace PruebaTecnicaFacundoTobioBack.Application.Services
                 Nombre = customer.Nombre,
                 Direccion = customer.Direccion,
                 Telefono = customer.Telefono,
-                Email = customer.Email
+                Email = customer.Email,
+                FechaCreacion = customer.FechaCreacion
             };
         }
 
@@ -66,7 +68,8 @@ namespace PruebaTecnicaFacundoTobioBack.Application.Services
                 Nombre = customer.Nombre,
                 Direccion = customer.Direccion,
                 Telefono = customer.Telefono,
-                Email = customer.Email
+                Email = customer.Email,
+                FechaCreacion = customer.FechaCreacion
             };
         }
 

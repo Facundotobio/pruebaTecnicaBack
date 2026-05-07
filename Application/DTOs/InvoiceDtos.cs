@@ -7,6 +7,7 @@ namespace PruebaTecnicaFacundoTobioBack.Application.DTOs
     {
         public int InvoiceId { get; set; }
         public int CustomerId { get; set; }
+        public string CustomerNombre { get; set; } = string.Empty;
         public DateTime Fecha { get; set; }
         public string Numero { get; set; } = string.Empty;
         public decimal Total { get; set; }

@@ -42,7 +42,9 @@ namespace PruebaTecnicaFacundoTobioBack.Application.Services
             var invoice = new Invoice
             {
                 CustomerId = invoiceDto.CustomerId,
-                Numero = invoiceDto.Numero,
+                Numero = string.IsNullOrWhiteSpace(invoiceDto.Numero) 
+                         ? $"FACT-{DateTime.UtcNow:yyyyMMddHHmmss}" 
+                         : invoiceDto.Numero,
                 Fecha = DateTime.UtcNow,
                 Items = invoiceDto.Items.Select(item => new InvoiceItem
                 {
@@ -77,6 +79,7 @@ namespace PruebaTecnicaFacundoTobioBack.Application.Services
             {
                 InvoiceId = invoice.InvoiceId,
                 CustomerId = invoice.CustomerId,
+                CustomerNombre = invoice.Customer?.Nombre ?? "N/A",
                 Fecha = invoice.Fecha,
                 Numero = invoice.Numero,
                 Total = invoice.Total,

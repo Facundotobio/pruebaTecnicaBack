@@ -14,6 +14,7 @@ namespace PruebaTecnicaFacundoTobioBack.Infrastructure.Repositories
         public async Task<IEnumerable<Invoice>> GetInvoicesWithItemsAsync()
         {
             return await _context.Invoices
+                .Include(i => i.Customer)
                 .Include(i => i.Items)
                 .OrderByDescending(i => i.Fecha)
                 .ToListAsync();
@@ -22,6 +23,7 @@ namespace PruebaTecnicaFacundoTobioBack.Infrastructure.Repositories
         public async Task<Invoice?> GetInvoiceWithItemsAsync(int id)
         {
             return await _context.Invoices
+                .Include(i => i.Customer)
                 .Include(i => i.Items)
                 .FirstOrDefaultAsync(i => i.InvoiceId == id);
         }
