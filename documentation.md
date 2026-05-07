@@ -35,7 +35,7 @@ PruebaTecnicaFacundoTobioBack/
 │   └── Repositories/   # Implementación de acceso a datos
 ├── Presentation/
 │   └── Controllers/    # Endpoints de la API
-└── Tests/              # Estructura preparada para Unit Testing
+└── Tests/              # Suite de Pruebas Unitarias
 ```
 
 ## 🛠️ Comandos Principales
@@ -51,7 +51,31 @@ dotnet ef database update
 ```bash
 dotnet run
 ```
-La API estará disponible en `http://localhost:5296` (o el puerto configurado) y puedes acceder a Swagger en la raíz `/`.
+La API estará disponible en `http://localhost:5296` y puedes acceder a Swagger en la raíz `/`.
+
+## 🧪 Testing
+
+El proyecto incluye una suite completa de pruebas unitarias para asegurar la calidad del código y el cumplimiento de las reglas de negocio.
+
+### Stack de Testing
+- **xUnit**: Framework principal de pruebas.
+- **Moq**: Librería para el aislamiento de dependencias mediante Mocks.
+- **FluentAssertions**: Para aserciones más legibles y semánticas.
+
+### Pruebas Implementadas
+- **CustomerService**: 
+    - Creación y edición de clientes.
+    - Validación de borrado seguro (impide borrar clientes con facturas asociadas).
+- **InvoiceService**: 
+    - **Validación de existencia de cliente**: Asegura que no se puedan crear facturas para clientes inexistentes (Integridad de Negocio).
+    - **Cálculo automático de totales**: Verifica que la suma de los items coincida exactamente con el total de la factura.
+    - Mapeo de estados y persistencia.
+
+### Ejecución de Tests
+Para ejecutar todas las pruebas desde la terminal:
+```bash
+dotnet test
+```
 
 ## 🧠 Decisiones de Diseño
 

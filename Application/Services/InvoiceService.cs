@@ -8,10 +8,12 @@ namespace PruebaTecnicaFacundoTobioBack.Application.Services
     public class InvoiceService : IInvoiceService
     {
         private readonly IInvoiceRepository _invoiceRepository;
+        private readonly ICustomerRepository _customerRepository;
 
-        public InvoiceService(IInvoiceRepository invoiceRepository)
+        public InvoiceService(IInvoiceRepository invoiceRepository, ICustomerRepository customerRepository)
         {
             _invoiceRepository = invoiceRepository;
+            _customerRepository = customerRepository;
         }
 
         public async Task<IEnumerable<InvoiceResponseDto>> GetAllAsync()
@@ -30,6 +32,13 @@ namespace PruebaTecnicaFacundoTobioBack.Application.Services
 
         public async Task<InvoiceResponseDto> CreateAsync(InvoiceCreateDto invoiceDto)
         {
+            // Validar que el cliente existe
+            var customer = await _customerRepository.GetByIdAsync(invoiceDto.CustomerId);
+            if (customer == null)
+            {
+                throw new ArgumentException($"No se encontró el cliente con ID {invoiceDto.CustomerId}");
+            }
+
             var invoice = new Invoice
             {
                 CustomerId = invoiceDto.CustomerId,
