@@ -80,23 +80,5 @@ namespace PruebaTecnicaFacundoTobioBack.Controllers
 
             return Ok(invoice);
         }
-
-        // DELETE: api/Invoice/{id} - Eliminar factura logicamente por ID
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteInvoice(int id)
-        {
-            var invoice = await _context.Invoices.FindAsync(id);
-            if (invoice == null)
-            {
-                return NotFound("La factura no existe.");
-            }
-
-            invoice.Estado = InvoiceStatus.Inactivo;
-
-            _context.Entry(invoice).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
-
-            return Ok(new { message = $"Factura {invoice.Numero} desactivada correctamente." });
-        }
     }
 }
