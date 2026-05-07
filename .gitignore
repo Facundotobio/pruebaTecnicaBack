@@ -19,4 +19,5 @@ packages/
 *.db
 
 # Environment
+appsettings.json
 appsettings.Development.json
