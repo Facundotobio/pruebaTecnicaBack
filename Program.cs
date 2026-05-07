@@ -1,9 +1,14 @@
-using Microsoft.EntityFrameworkCore;
+ï»¿using Microsoft.EntityFrameworkCore;
 using PruebaTecnicaFacundoTobioBack.Data;
+using PruebaTecnicaFacundoTobioBack.Interfaces;
+using PruebaTecnicaFacundoTobioBack.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // 1. SERVICIOS
+builder.Services.AddScoped<ICustomerService, CustomerService>();
+builder.Services.AddScoped<IInvoiceService, InvoiceService>();
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
@@ -34,7 +39,7 @@ builder.Services.AddControllers()
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// 2. CONSTRUCCIÓN
+// 2. CONSTRUCCION
 var app = builder.Build();
 
 // 3. MIGRACIONES (se ejecutan una vez al arrancar)
@@ -45,7 +50,7 @@ using (var scope = app.Services.CreateScope())
     {
         var context = services.GetRequiredService<ApplicationDbContext>();
         context.Database.Migrate();
-        Console.WriteLine("Migraciones aplicadas con éxito.");
+        Console.WriteLine("Migraciones aplicadas con exito.");
     }
     catch (Exception ex)
     {
@@ -57,7 +62,7 @@ using (var scope = app.Services.CreateScope())
 app.UseSwagger();
 app.UseSwaggerUI(c => {
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "API V1");
-    c.RoutePrefix = string.Empty; // Abrir Swagger al entrar a http://localhost:5296
+    c.RoutePrefix = string.Empty;
 });
 
 app.UseHttpsRedirection();

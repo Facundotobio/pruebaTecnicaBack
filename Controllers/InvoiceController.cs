@@ -1,8 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using PruebaTecnicaFacundoTobioBack.Data;
-using PruebaTecnicaFacundoTobioBack.Models;
-using static PruebaTecnicaFacundoTobioBack.Data.@enum;
+using Microsoft.AspNetCore.Mvc;
+using PruebaTecnicaFacundoTobioBack.DTOs;
+using PruebaTecnicaFacundoTobioBack.Interfaces;
 
 namespace PruebaTecnicaFacundoTobioBack.Controllers
 {
@@ -10,75 +8,57 @@ namespace PruebaTecnicaFacundoTobioBack.Controllers
     [ApiController]
     public class InvoiceController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IInvoiceService _invoiceService;
 
-        public InvoiceController(ApplicationDbContext context)
+        public InvoiceController(IInvoiceService invoiceService)
         {
-            _context = context;
+            _invoiceService = invoiceService;
         }
 
-        // POST: api/Invoice - Crear Factura
+        // POST: api/Invoice
         [HttpPost]
-        public async Task<ActionResult<Invoice>> PostInvoice(Invoice invoice)
+        public async Task<ActionResult<InvoiceResponseDto>> PostInvoice(InvoiceCreateDto invoiceDto)
         {
-            if (invoice == null || invoice.Items == null || !invoice.Items.Any())
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            try
             {
-                return BadRequest("La factura debe contener al menos un item.");
+                var result = await _invoiceService.CreateAsync(invoiceDto);
+                return CreatedAtAction(nameof(GetInvoices), new { id = result.InvoiceId }, result);
             }
-
-            if (invoice.CustomerId <= 0)
+            catch (Exception ex)
             {
-                return BadRequest("Debe especificar un CustomerId válido.");
+                return BadRequest(ex.Message);
             }
-
-            // Generar número de factura
-            invoice.Numero = $"FACT-{DateTime.UtcNow:yyyyMMddHHmmss}";
-
-            // Calcular total
-            invoice.Total = invoice.Items.Sum(i => i.Cantidad * i.PrecioUnitario);
-
-            invoice.Estado = InvoiceStatus.Activo;
-            invoice.Fecha = DateTime.UtcNow;
-
-            _context.Invoices.Add(invoice);
-            await _context.SaveChangesAsync();
-
-            // Retornar factura completa
-            var facturaCreada = await _context.Invoices
-                .Include(i => i.Items)
-                .Include(i => i.Customer)
-                .FirstOrDefaultAsync(i => i.InvoiceId == invoice.InvoiceId);
-
-            return CreatedAtAction(nameof(GetInvoiceById), new { id = invoice.InvoiceId }, facturaCreada);
         }
 
-        // GET: api/Invoice
+        // GET: api/Invoice - Listado completo
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Invoice>>> GetInvoices()
+        public async Task<ActionResult<IEnumerable<InvoiceResponseDto>>> GetInvoices()
         {
-            // Usamos AsNoTracking() para mejorar el rendimiento en lecturas
-            var invoices = await _context.Invoices
-                .Include(i => i.Customer)
-                .Include(i => i.Items)
-                .Where(i => i.Estado == InvoiceStatus.Activo)
-                .AsNoTracking()
-                .ToListAsync();
-
+            var invoices = await _invoiceService.GetAllAsync();
             return Ok(invoices);
         }
 
-        // GET: api/Invoice/5
+        // GET: api/Invoice/{id}
         [HttpGet("{id}")]
-        public async Task<ActionResult<Invoice>> GetInvoiceById(int id)
+        public async Task<ActionResult<InvoiceResponseDto>> GetInvoice(int id)
         {
-            var invoice = await _context.Invoices
-                .Include(i => i.Customer)
-                .Include(i => i.Items)
-                .FirstOrDefaultAsync(i => i.InvoiceId == id && i.Estado == InvoiceStatus.Activo);
-
-            if (invoice == null) return NotFound("Factura no encontrada.");
+            var invoice = await _invoiceService.GetByIdAsync(id);
+            if (invoice == null) return NotFound();
 
             return Ok(invoice);
+        }
+
+        // DELETE: api/Invoice/{id}
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteInvoice(int id)
+        {
+            var success = await _invoiceService.DeleteAsync(id);
+            if (!success) return NotFound();
+
+            return NoContent();
         }
     }
 }

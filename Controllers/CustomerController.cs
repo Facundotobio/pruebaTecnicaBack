@@ -1,7 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using PruebaTecnicaFacundoTobioBack.Data;
-using PruebaTecnicaFacundoTobioBack.Models;
+using Microsoft.AspNetCore.Mvc;
+using PruebaTecnicaFacundoTobioBack.DTOs;
+using PruebaTecnicaFacundoTobioBack.Interfaces;
 
 namespace PruebaTecnicaFacundoTobioBack.Controllers
 {
@@ -9,54 +8,56 @@ namespace PruebaTecnicaFacundoTobioBack.Controllers
     [ApiController]
     public class CustomerController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ICustomerService _customerService;
 
-        public CustomerController(ApplicationDbContext context)
+        public CustomerController(ICustomerService customerService)
         {
-            _context = context;
+            _customerService = customerService;
         }
 
         // POST: api/Customer
         [HttpPost]
-        public async Task<ActionResult<Customer>> PostCustomer(Customer customer)
+        public async Task<ActionResult<CustomerResponseDto>> PostCustomer(CustomerCreateDto customerDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            _context.Customers.Add(customer);
-            await _context.SaveChangesAsync();
+            var result = await _customerService.CreateAsync(customerDto);
 
-            return CreatedAtAction(nameof(GetCustomers), new { id = customer.CustomerId }, customer);
+            return CreatedAtAction(nameof(GetCustomers), new { id = result.CustomerId }, result);
         }
 
         // GET: api/Customer - Listado completo
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Customer>>> GetCustomers()
+        public async Task<ActionResult<IEnumerable<CustomerResponseDto>>> GetCustomers()
         {
-            var customers = await _context.Customers
-                .OrderBy(c => c.Nombre)
-                .ToListAsync();
-
+            var customers = await _customerService.GetAllAsync();
             return Ok(customers);
+        }
+
+        // GET: api/Customer/{id}
+        [HttpGet("{id}")]
+        public async Task<ActionResult<CustomerResponseDto>> GetCustomer(int id)
+        {
+            var customer = await _customerService.GetByIdAsync(id);
+            if (customer == null) return NotFound();
+            return Ok(customer);
         }
 
         // PUT: api/Customer/{id}
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutCustomer(int id, [FromBody] Customer customer)
+        public async Task<IActionResult> PutCustomer(int id, [FromBody] CustomerUpdateDto customerDto)
         {
-            var existingCustomer = await _context.Customers.FindAsync(id);
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
-            if (existingCustomer == null)
+            var success = await _customerService.UpdateAsync(id, customerDto);
+
+            if (!success)
             {
-                return NotFound($"No se encontró el cliente con ID {id}");
+                return NotFound($"No se encontro el cliente con ID {id}");
             }
 
-            existingCustomer.Nombre = customer.Nombre;
-            existingCustomer.Direccion = customer.Direccion;
-            existingCustomer.Telefono = customer.Telefono;
-            existingCustomer.Email = customer.Email;
-
-            await _context.SaveChangesAsync();
             return NoContent();
         }
 
@@ -64,27 +65,17 @@ namespace PruebaTecnicaFacundoTobioBack.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCustomer(int id)
         {
-            var customer = await _context.Customers
-                .Include(c => c.Invoices)
-                .FirstOrDefaultAsync(c => c.CustomerId == id);
-
-            if (customer == null)
-                return NotFound();
-
-            if (customer.Invoices.Any())
+            try
             {
-                return BadRequest("No se puede eliminar el cliente porque tiene facturas asociadas.");
+                var success = await _customerService.DeleteAsync(id);
+                if (!success) return NotFound();
+
+                return NoContent();
             }
-
-            _context.Customers.Remove(customer);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-
-        private bool CustomerExists(int id)
-        {
-            return _context.Customers.Any(e => e.CustomerId == id);
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }
