@@ -1,5 +1,5 @@
-using System.ComponentModel.DataAnnotations;
-using static PruebaTecnicaFacundoTobioBack.Infrastructure.Data.@enum;
+﻿using System.ComponentModel.DataAnnotations;
+using static PruebaTecnicaFacundoTobioBack.Infrastructure.Data.Enums;
 
 namespace PruebaTecnicaFacundoTobioBack.Domain.Entities
 {
@@ -27,7 +27,7 @@ namespace PruebaTecnicaFacundoTobioBack.Domain.Entities
         [Required]
         public EntityStatus Estado { get; set; } = EntityStatus.Activo;
 
-        // Navegación
+        // NavegaciÃ³n
         [System.Text.Json.Serialization.JsonIgnore]
         public ICollection<Invoice> Invoices { get; set; } = new List<Invoice>();
     }

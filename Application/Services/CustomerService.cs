@@ -1,8 +1,8 @@
-using PruebaTecnicaFacundoTobioBack.Application.DTOs;
+﻿using PruebaTecnicaFacundoTobioBack.Application.DTOs;
 using PruebaTecnicaFacundoTobioBack.Application.Interfaces;
 using PruebaTecnicaFacundoTobioBack.Domain.Entities;
 using PruebaTecnicaFacundoTobioBack.Domain.Interfaces;
-using static PruebaTecnicaFacundoTobioBack.Infrastructure.Data.@enum;
+using static PruebaTecnicaFacundoTobioBack.Infrastructure.Data.Enums;
 
 namespace PruebaTecnicaFacundoTobioBack.Application.Services
 {
@@ -93,7 +93,7 @@ namespace PruebaTecnicaFacundoTobioBack.Application.Services
             var customer = await _customerRepository.GetCustomerWithInvoicesAsync(id);
             if (customer == null || customer.Estado == EntityStatus.Inactivo) return false;
 
-            // Regla de negocio: No se puede eliminar si tiene facturas (aunque sea borrado lógico, para mantener integridad si se requiere)
+            // Regla de negocio: No se puede eliminar si tiene facturas (aunque sea borrado lÃ³gico, para mantener integridad si se requiere)
             if (customer.Invoices.Any())
             {
                 throw new InvalidOperationException("No se puede eliminar el cliente porque tiene facturas asociadas.");

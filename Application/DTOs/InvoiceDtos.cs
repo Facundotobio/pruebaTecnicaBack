@@ -1,5 +1,5 @@
-using System.ComponentModel.DataAnnotations;
-using static PruebaTecnicaFacundoTobioBack.Infrastructure.Data.@enum;
+﻿using System.ComponentModel.DataAnnotations;
+using static PruebaTecnicaFacundoTobioBack.Infrastructure.Data.Enums;
 
 namespace PruebaTecnicaFacundoTobioBack.Application.DTOs
 {

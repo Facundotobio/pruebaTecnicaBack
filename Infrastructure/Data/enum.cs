@@ -1,6 +1,6 @@
 namespace PruebaTecnicaFacundoTobioBack.Infrastructure.Data
 {
-    public class @enum
+    public class Enums
     {
         public enum EntityStatus
         {

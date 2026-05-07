@@ -1,11 +1,11 @@
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using PruebaTecnicaFacundoTobioBack.Application.DTOs;
 using PruebaTecnicaFacundoTobioBack.Domain.Interfaces;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using static PruebaTecnicaFacundoTobioBack.Infrastructure.Data.@enum;
+using static PruebaTecnicaFacundoTobioBack.Infrastructure.Data.Enums;
 
 namespace PruebaTecnicaFacundoTobioBack.Application.Services
 {

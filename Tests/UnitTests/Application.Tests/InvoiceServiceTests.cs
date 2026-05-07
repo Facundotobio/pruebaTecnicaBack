@@ -5,7 +5,7 @@ using PruebaTecnicaFacundoTobioBack.Application.DTOs;
 using PruebaTecnicaFacundoTobioBack.Domain.Entities;
 using PruebaTecnicaFacundoTobioBack.Domain.Interfaces;
 using Xunit;
-using static PruebaTecnicaFacundoTobioBack.Infrastructure.Data.@enum;
+using static PruebaTecnicaFacundoTobioBack.Infrastructure.Data.Enums;
 
 namespace Application.Tests
 {
