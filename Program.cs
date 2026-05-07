@@ -1,9 +1,13 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using PruebaTecnicaFacundoTobioBack.Application.Interfaces;
 using PruebaTecnicaFacundoTobioBack.Application.Services;
 using PruebaTecnicaFacundoTobioBack.Domain.Interfaces;
 using PruebaTecnicaFacundoTobioBack.Infrastructure.Data;
 using PruebaTecnicaFacundoTobioBack.Infrastructure.Repositories;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +19,30 @@ builder.Services.AddScoped<IInvoiceRepository, InvoiceRepository>();
 // Capa de Aplicacion: Servicios
 builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddScoped<IInvoiceService, InvoiceService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+
+// CONFIGURACION JWT
+var jwtSettings = builder.Configuration.GetSection("Jwt");
+var key = Encoding.UTF8.GetBytes(jwtSettings["Key"]!);
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = jwtSettings["Issuer"],
+        ValidAudience = jwtSettings["Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(key)
+    };
+});
 
 builder.Services.AddCors(options =>
 {
@@ -44,12 +72,40 @@ builder.Services.AddControllers()
     });
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+
+// Configurar Swagger para JWT
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Prueba Tecnica API", Version = "v1" });
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Description = "JWT Authorization header usando el esquema Bearer. Ejemplo: \"Authorization: Bearer {token}\"",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer"
+    });
+
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new string[] {}
+        }
+    });
+});
 
 // 2. CONSTRUCCION
 var app = builder.Build();
 
-// 3. MIGRACIONES (se ejecutan una vez al arrancar)
+// 3. MIGRACIONES
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
@@ -74,6 +130,7 @@ app.UseSwaggerUI(c => {
 
 app.UseHttpsRedirection();
 app.UseCors("AllowFrontend");
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 

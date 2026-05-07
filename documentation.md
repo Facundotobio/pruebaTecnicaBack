@@ -71,10 +71,32 @@ El proyecto incluye una suite completa de pruebas unitarias para asegurar la cal
     - **Cálculo automático de totales**: Verifica que la suma de los items coincida exactamente con el total de la factura.
     - Mapeo de estados y persistencia.
 
-### Ejecución de Tests
-Para ejecutar todas las pruebas desde la terminal:
 ```bash
 dotnet test
+```
+Las pruebas cubren:
+- Reglas de negocio de Clientes (borrado lógico, validación de facturas).
+- Cálculos automáticos de Facturas.
+
+### Seguridad y Autenticación (JWT)
+El sistema utiliza **JSON Web Tokens (JWT)** para proteger los recursos.
+
+#### Flujo de Autenticación:
+1. **Login**: POST a `/api/Auth/login` enviando solo el `Email`.
+2. **Validación**: El servidor verifica que el cliente esté registrado y con `Estado = Activo`.
+3. **Token**: Se devuelve un token JWT válido por 8 horas.
+
+#### Cómo usar el Token:
+Para acceder a los endpoints de `Customer` o `Invoice`, se debe incluir el header de autorización:
+`Authorization: Bearer <token>`
+
+#### Configuración (appsettings.json):
+```json
+"Jwt": {
+  "Key": "Su_Clave_Secreta",
+  "Issuer": "PruebaTecnicaAPI",
+  "Audience": "PruebaTecnicaFront"
+}
 ```
 
 ## 🧠 Decisiones de Diseño

@@ -1,9 +1,11 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PruebaTecnicaFacundoTobioBack.Application.DTOs;
 using PruebaTecnicaFacundoTobioBack.Application.Interfaces;
 
 namespace PruebaTecnicaFacundoTobioBack.Presentation.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class InvoiceController : ControllerBase
