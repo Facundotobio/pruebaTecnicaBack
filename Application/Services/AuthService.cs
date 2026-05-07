@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using PruebaTecnicaFacundoTobioBack.Application.DTOs;
 using PruebaTecnicaFacundoTobioBack.Domain.Interfaces;
@@ -35,7 +35,7 @@ namespace PruebaTecnicaFacundoTobioBack.Application.Services
 
             if (customer == null) return null;
 
-            var token = GenerateJwtToken(customer.Email);
+            var token = GenerateJwtToken(customer.Nombre, customer.Email);
 
             return new AuthResponseDto
             {
@@ -45,7 +45,7 @@ namespace PruebaTecnicaFacundoTobioBack.Application.Services
             };
         }
 
-        private string GenerateJwtToken(string email)
+        private string GenerateJwtToken(string nombre, string email)
         {
             var jwtSettings = _configuration.GetSection("Jwt");
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Key"]!));
