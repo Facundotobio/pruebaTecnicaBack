@@ -3,8 +3,7 @@ using PruebaTecnicaFacundoTobioBack.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 1. CONFIGURACIÓN DE SERVICIOS (builder.Services)
-// ==================== CORS CONFIGURATION ====================
+// 1. SERVICIOS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
@@ -21,18 +20,10 @@ builder.Services.AddCors(options =>
     });
 });
 
-// ==================== DATABASE ====================
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-
-if (string.IsNullOrEmpty(connectionString))
-{
-    throw new Exception("La cadena de conexión 'DefaultConnection' no fue encontrada.");
-}
-
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString));
 
-// ==================== CONTROLLERS + JSON ====================
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
@@ -43,10 +34,10 @@ builder.Services.AddControllers()
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// 2. CONSTRUCCIÓN DE LA APP
+// 2. CONSTRUCCIÓN
 var app = builder.Build();
 
-// 3. MIGRACIONES AUTOMÁTICAS
+// 3. MIGRACIONES (se ejecutan una vez al arrancar)
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
@@ -58,24 +49,21 @@ using (var scope = app.Services.CreateScope())
     }
     catch (Exception ex)
     {
-        Console.WriteLine($"Error al aplicar migraciones: {ex.Message}");
+        Console.WriteLine($"Error en migraciones: {ex.Message}");
     }
 }
 
-// 4. CONFIGURACIÓN DEL MIDDLEWARE (app.Use...)
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+// 4. MIDDLEWARE
+app.UseSwagger();
+app.UseSwaggerUI(c => {
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "API V1");
+    c.RoutePrefix = string.Empty; // Abrir Swagger al entrar a http://localhost:5296
+});
 
 app.UseHttpsRedirection();
-
 app.UseCors("AllowFrontend");
-
 app.UseAuthorization();
-
 app.MapControllers();
 
-// 5. ARRANCAR LA APP
+// 5. Arranque
 app.Run();

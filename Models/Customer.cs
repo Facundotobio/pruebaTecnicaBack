@@ -24,7 +24,7 @@ namespace PruebaTecnicaFacundoTobioBack.Models
         public DateTime FechaCreacion { get; set; } = DateTime.UtcNow;
 
         // Navegación
-        [System.Text.Json.Serialization.JsonIgnore] // para evitar que se serialicen en ambos sentidos y genere bucles infinitos
+        [System.Text.Json.Serialization.JsonIgnore] // evitar que se serialicen en ambos sentidos y genere bucles infinitos
         public ICollection<Invoice> Invoices { get; set; } = new List<Invoice>();
     }
 }
