@@ -17,8 +17,10 @@ namespace PruebaTecnicaFacundoTobioBack.Application.Services
         public async Task<IEnumerable<CustomerResponseDto>> GetAllAsync()
         {
             var customers = await _customerRepository.GetAllAsync();
-            
-            return customers.OrderBy(c => c.Nombre).Select(c => new CustomerResponseDto
+            return customers
+                .Where(c => c.Estado == EntityStatus.Activo)
+                .OrderBy(c => c.Nombre)
+                .Select(c => new CustomerResponseDto
             {
                 CustomerId = c.CustomerId,
                 Nombre = c.Nombre,
@@ -31,7 +33,7 @@ namespace PruebaTecnicaFacundoTobioBack.Application.Services
         public async Task<CustomerResponseDto?> GetByIdAsync(int id)
         {
             var customer = await _customerRepository.GetByIdAsync(id);
-            if (customer == null) return null;
+            if (customer == null || customer.Estado == EntityStatus.Inactivo) return null;
 
             return new CustomerResponseDto
             {
@@ -50,7 +52,8 @@ namespace PruebaTecnicaFacundoTobioBack.Application.Services
                 Nombre = customerDto.Nombre,
                 Direccion = customerDto.Direccion,
                 Telefono = customerDto.Telefono,
-                Email = customerDto.Email
+                Email = customerDto.Email,
+                Estado = EntityStatus.Activo
             };
 
             await _customerRepository.AddAsync(customer);
@@ -69,7 +72,7 @@ namespace PruebaTecnicaFacundoTobioBack.Application.Services
         public async Task<bool> UpdateAsync(int id, CustomerUpdateDto customerDto)
         {
             var existingCustomer = await _customerRepository.GetByIdAsync(id);
-            if (existingCustomer == null) return false;
+            if (existingCustomer == null || existingCustomer.Estado == EntityStatus.Inactivo) return false;
 
             existingCustomer.Nombre = customerDto.Nombre;
             existingCustomer.Direccion = customerDto.Direccion;
@@ -84,16 +87,16 @@ namespace PruebaTecnicaFacundoTobioBack.Application.Services
         public async Task<bool> DeleteAsync(int id)
         {
             var customer = await _customerRepository.GetCustomerWithInvoicesAsync(id);
+            if (customer == null || customer.Estado == EntityStatus.Inactivo) return false;
 
-            if (customer == null) return false;
-
-            // Regla de negocio: no borrar clientes con facturas
+            // Regla de negocio: No se puede eliminar si tiene facturas (aunque sea borrado lógico, para mantener integridad si se requiere)
             if (customer.Invoices.Any())
             {
                 throw new InvalidOperationException("No se puede eliminar el cliente porque tiene facturas asociadas.");
             }
 
-            _customerRepository.Remove(customer);
+            customer.Estado = EntityStatus.Inactivo;
+            _customerRepository.Update(customer);
             await _customerRepository.SaveChangesAsync();
             return true;
         }

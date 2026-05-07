@@ -20,7 +20,7 @@ namespace PruebaTecnicaFacundoTobioBack.Domain.Entities
         public decimal Total { get; set; }
 
         [Required]
-        public InvoiceStatus Estado { get; set; } = InvoiceStatus.Activo;
+        public EntityStatus Estado { get; set; } = EntityStatus.Activo;
 
         // Navegación
         public Customer? Customer { get; set; }

@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using static PruebaTecnicaFacundoTobioBack.Infrastructure.Data.@enum;
 
 namespace PruebaTecnicaFacundoTobioBack.Domain.Entities
 {
@@ -23,8 +24,11 @@ namespace PruebaTecnicaFacundoTobioBack.Domain.Entities
 
         public DateTime FechaCreacion { get; set; } = DateTime.UtcNow;
 
+        [Required]
+        public EntityStatus Estado { get; set; } = EntityStatus.Activo;
+
         // Navegación
-        [System.Text.Json.Serialization.JsonIgnore] // evitar que se serialicen en ambos sentidos y genere bucles infinitos
+        [System.Text.Json.Serialization.JsonIgnore]
         public ICollection<Invoice> Invoices { get; set; } = new List<Invoice>();
     }
 }

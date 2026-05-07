@@ -1,4 +1,4 @@
-using Moq;
+﻿using Moq;
 using FluentAssertions;
 using PruebaTecnicaFacundoTobioBack.Application.Services;
 using PruebaTecnicaFacundoTobioBack.Application.DTOs;
@@ -64,7 +64,7 @@ namespace Application.Tests
 
             // Assert
             await act.Should().ThrowAsync<ArgumentException>()
-                .WithMessage("No se encontró el cliente con ID 99");
+                .WithMessage("No se encontrÃ³ el cliente con ID 99");
             
             _invoiceRepositoryMock.Verify(r => r.AddAsync(It.IsAny<Invoice>()), Times.Never);
         }
@@ -80,7 +80,7 @@ namespace Application.Tests
                 CustomerId = 1,
                 Numero = "FAC-10",
                 Total = 500,
-                Estado = InvoiceStatus.Activo,
+                Estado = EntityStatus.Activo,
                 Items = new List<InvoiceItem>
                 {
                     new InvoiceItem { Descripcion = "Test Item", Cantidad = 1, PrecioUnitario = 500 }
