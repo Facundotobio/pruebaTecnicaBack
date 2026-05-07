@@ -1,4 +1,4 @@
-﻿namespace PruebaTecnicaFacundoTobioBack.Data
+namespace PruebaTecnicaFacundoTobioBack.Infrastructure.Data
 {
     public class @enum
     {

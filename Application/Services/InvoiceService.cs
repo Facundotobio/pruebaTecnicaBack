@@ -1,36 +1,28 @@
-using Microsoft.EntityFrameworkCore;
-using PruebaTecnicaFacundoTobioBack.Data;
-using PruebaTecnicaFacundoTobioBack.DTOs;
-using PruebaTecnicaFacundoTobioBack.Interfaces;
-using PruebaTecnicaFacundoTobioBack.Models;
+using PruebaTecnicaFacundoTobioBack.Application.DTOs;
+using PruebaTecnicaFacundoTobioBack.Application.Interfaces;
+using PruebaTecnicaFacundoTobioBack.Domain.Entities;
+using PruebaTecnicaFacundoTobioBack.Domain.Interfaces;
 
-namespace PruebaTecnicaFacundoTobioBack.Services
+namespace PruebaTecnicaFacundoTobioBack.Application.Services
 {
     public class InvoiceService : IInvoiceService
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IInvoiceRepository _invoiceRepository;
 
-        public InvoiceService(ApplicationDbContext context)
+        public InvoiceService(IInvoiceRepository invoiceRepository)
         {
-            _context = context;
+            _invoiceRepository = invoiceRepository;
         }
 
         public async Task<IEnumerable<InvoiceResponseDto>> GetAllAsync()
         {
-            var invoices = await _context.Invoices
-                .Include(i => i.Items)
-                .OrderByDescending(i => i.Fecha)
-                .ToListAsync();
-
+            var invoices = await _invoiceRepository.GetInvoicesWithItemsAsync();
             return invoices.Select(i => MapToResponseDto(i));
         }
 
         public async Task<InvoiceResponseDto?> GetByIdAsync(int id)
         {
-            var invoice = await _context.Invoices
-                .Include(i => i.Items)
-                .FirstOrDefaultAsync(i => i.InvoiceId == id);
-
+            var invoice = await _invoiceRepository.GetInvoiceWithItemsAsync(id);
             if (invoice == null) return null;
 
             return MapToResponseDto(invoice);
@@ -51,22 +43,22 @@ namespace PruebaTecnicaFacundoTobioBack.Services
                 }).ToList()
             };
 
-            // Calculate total
+            // El total se calcula en la entidad o aquí
             invoice.Total = invoice.Items.Sum(item => item.Subtotal);
 
-            _context.Invoices.Add(invoice);
-            await _context.SaveChangesAsync();
+            await _invoiceRepository.AddAsync(invoice);
+            await _invoiceRepository.SaveChangesAsync();
 
             return MapToResponseDto(invoice);
         }
 
         public async Task<bool> DeleteAsync(int id)
         {
-            var invoice = await _context.Invoices.FindAsync(id);
+            var invoice = await _invoiceRepository.GetByIdAsync(id);
             if (invoice == null) return false;
 
-            _context.Invoices.Remove(invoice);
-            await _context.SaveChangesAsync();
+            _invoiceRepository.Remove(invoice);
+            await _invoiceRepository.SaveChangesAsync();
             return true;
         }
 

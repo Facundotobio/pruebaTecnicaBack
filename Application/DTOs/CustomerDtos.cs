@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace PruebaTecnicaFacundoTobioBack.DTOs
+namespace PruebaTecnicaFacundoTobioBack.Application.DTOs
 {
     public class CustomerResponseDto
     {

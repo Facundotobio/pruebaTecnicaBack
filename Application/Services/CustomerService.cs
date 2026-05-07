@@ -1,38 +1,36 @@
-using Microsoft.EntityFrameworkCore;
-using PruebaTecnicaFacundoTobioBack.Data;
-using PruebaTecnicaFacundoTobioBack.DTOs;
-using PruebaTecnicaFacundoTobioBack.Interfaces;
-using PruebaTecnicaFacundoTobioBack.Models;
+using PruebaTecnicaFacundoTobioBack.Application.DTOs;
+using PruebaTecnicaFacundoTobioBack.Application.Interfaces;
+using PruebaTecnicaFacundoTobioBack.Domain.Entities;
+using PruebaTecnicaFacundoTobioBack.Domain.Interfaces;
 
-namespace PruebaTecnicaFacundoTobioBack.Services
+namespace PruebaTecnicaFacundoTobioBack.Application.Services
 {
     public class CustomerService : ICustomerService
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ICustomerRepository _customerRepository;
 
-        public CustomerService(ApplicationDbContext context)
+        public CustomerService(ICustomerRepository customerRepository)
         {
-            _context = context;
+            _customerRepository = customerRepository;
         }
 
         public async Task<IEnumerable<CustomerResponseDto>> GetAllAsync()
         {
-            return await _context.Customers
-                .OrderBy(c => c.Nombre)
-                .Select(c => new CustomerResponseDto
-                {
-                    CustomerId = c.CustomerId,
-                    Nombre = c.Nombre,
-                    Direccion = c.Direccion,
-                    Telefono = c.Telefono,
-                    Email = c.Email
-                })
-                .ToListAsync();
+            var customers = await _customerRepository.GetAllAsync();
+            
+            return customers.OrderBy(c => c.Nombre).Select(c => new CustomerResponseDto
+            {
+                CustomerId = c.CustomerId,
+                Nombre = c.Nombre,
+                Direccion = c.Direccion,
+                Telefono = c.Telefono,
+                Email = c.Email
+            });
         }
 
         public async Task<CustomerResponseDto?> GetByIdAsync(int id)
         {
-            var customer = await _context.Customers.FindAsync(id);
+            var customer = await _customerRepository.GetByIdAsync(id);
             if (customer == null) return null;
 
             return new CustomerResponseDto
@@ -55,8 +53,8 @@ namespace PruebaTecnicaFacundoTobioBack.Services
                 Email = customerDto.Email
             };
 
-            _context.Customers.Add(customer);
-            await _context.SaveChangesAsync();
+            await _customerRepository.AddAsync(customer);
+            await _customerRepository.SaveChangesAsync();
 
             return new CustomerResponseDto
             {
@@ -70,7 +68,7 @@ namespace PruebaTecnicaFacundoTobioBack.Services
 
         public async Task<bool> UpdateAsync(int id, CustomerUpdateDto customerDto)
         {
-            var existingCustomer = await _context.Customers.FindAsync(id);
+            var existingCustomer = await _customerRepository.GetByIdAsync(id);
             if (existingCustomer == null) return false;
 
             existingCustomer.Nombre = customerDto.Nombre;
@@ -78,26 +76,25 @@ namespace PruebaTecnicaFacundoTobioBack.Services
             existingCustomer.Telefono = customerDto.Telefono;
             existingCustomer.Email = customerDto.Email;
 
-            await _context.SaveChangesAsync();
+            _customerRepository.Update(existingCustomer);
+            await _customerRepository.SaveChangesAsync();
             return true;
         }
 
         public async Task<bool> DeleteAsync(int id)
         {
-            var customer = await _context.Customers
-                .Include(c => c.Invoices)
-                .FirstOrDefaultAsync(c => c.CustomerId == id);
+            var customer = await _customerRepository.GetCustomerWithInvoicesAsync(id);
 
             if (customer == null) return false;
 
-            // Business rule: cannot delete customer with invoices
+            // Regla de negocio: no borrar clientes con facturas
             if (customer.Invoices.Any())
             {
                 throw new InvalidOperationException("No se puede eliminar el cliente porque tiene facturas asociadas.");
             }
 
-            _context.Customers.Remove(customer);
-            await _context.SaveChangesAsync();
+            _customerRepository.Remove(customer);
+            await _customerRepository.SaveChangesAsync();
             return true;
         }
     }

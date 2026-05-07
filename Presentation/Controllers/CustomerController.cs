@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
-using PruebaTecnicaFacundoTobioBack.DTOs;
-using PruebaTecnicaFacundoTobioBack.Interfaces;
+using PruebaTecnicaFacundoTobioBack.Application.DTOs;
+using PruebaTecnicaFacundoTobioBack.Application.Interfaces;
 
-namespace PruebaTecnicaFacundoTobioBack.Controllers
+namespace PruebaTecnicaFacundoTobioBack.Presentation.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -55,7 +55,7 @@ namespace PruebaTecnicaFacundoTobioBack.Controllers
 
             if (!success)
             {
-                return NotFound($"No se encontro el cliente con ID {id}");
+                return NotFound($"No se encontró el cliente con ID {id}");
             }
 
             return NoContent();

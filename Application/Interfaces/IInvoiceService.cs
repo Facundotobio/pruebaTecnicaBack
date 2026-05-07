@@ -1,6 +1,6 @@
-using PruebaTecnicaFacundoTobioBack.DTOs;
+using PruebaTecnicaFacundoTobioBack.Application.DTOs;
 
-namespace PruebaTecnicaFacundoTobioBack.Interfaces
+namespace PruebaTecnicaFacundoTobioBack.Application.Interfaces
 {
     public interface IInvoiceService
     {

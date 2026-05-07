@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
-using static PruebaTecnicaFacundoTobioBack.Data.@enum;
+using static PruebaTecnicaFacundoTobioBack.Infrastructure.Data.@enum;
 
-namespace PruebaTecnicaFacundoTobioBack.DTOs
+namespace PruebaTecnicaFacundoTobioBack.Application.DTOs
 {
     public class InvoiceResponseDto
     {

@@ -1,7 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
-using PruebaTecnicaFacundoTobioBack.Models;
+using Microsoft.EntityFrameworkCore;
+using PruebaTecnicaFacundoTobioBack.Domain.Entities;
 
-namespace PruebaTecnicaFacundoTobioBack.Data
+namespace PruebaTecnicaFacundoTobioBack.Infrastructure.Data
 {
     public class ApplicationDbContext : DbContext
     {

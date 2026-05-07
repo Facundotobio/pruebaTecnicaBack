@@ -1,11 +1,18 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using PruebaTecnicaFacundoTobioBack.Data;
-using PruebaTecnicaFacundoTobioBack.Interfaces;
-using PruebaTecnicaFacundoTobioBack.Services;
+using PruebaTecnicaFacundoTobioBack.Application.Interfaces;
+using PruebaTecnicaFacundoTobioBack.Application.Services;
+using PruebaTecnicaFacundoTobioBack.Domain.Interfaces;
+using PruebaTecnicaFacundoTobioBack.Infrastructure.Data;
+using PruebaTecnicaFacundoTobioBack.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // 1. SERVICIOS
+// Capa de Infraestructura: Repositorios
+builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+builder.Services.AddScoped<IInvoiceRepository, InvoiceRepository>();
+
+// Capa de Aplicacion: Servicios
 builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddScoped<IInvoiceService, InvoiceService>();
 
